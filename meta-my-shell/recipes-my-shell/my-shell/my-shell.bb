@@ -18,10 +18,7 @@ S = "${WORKDIR}"
 # recipe automatically - you will need to examine the Makefile yourself and ensure
 # that the appropriate arguments are passed in.
 
-do_configure () {
-	# Specify any needed configure commands here
-	:
-}
+TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_compile () {
 	# You will almost certainly need to add additional arguments here
@@ -29,9 +26,7 @@ do_compile () {
 }
 
 do_install () {
-	# NOTE: unable to determine what to put here - there is a Makefile but no
-	# target named "install", so you will need to define this yourself
-	:
+
 	install -d ${D}${bindir}
     install -m 0755 ${S}/my-shell ${D}${bindir}
 }
