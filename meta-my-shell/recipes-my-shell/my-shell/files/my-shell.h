@@ -29,11 +29,13 @@
 char command[MAX_COMMAND_LENGTH]; //array to store the commands
 char *args[MAX_ARGS]; // Array to hold command arguments
 char *token=NULL; //token for parsing
+int number_of_token = 0;
 	
 /* section : Function Declaration  */
 
 int read_command(char *command,int max_length);
 int parse_command(char *command,char** args,char* token);
+void execute_with_pipe(char **args, int pipe_pos);
 int execute_command(char** args);
 
 #endif	/* MY_SHELL_H */

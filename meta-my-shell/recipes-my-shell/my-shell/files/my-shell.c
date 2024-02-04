@@ -9,7 +9,6 @@
 int main() {
 	
     while (1) {
-    
         printf("myshell> ");  // Print the prompt
 
 		//read the command
@@ -18,15 +17,27 @@ int main() {
 		}
 		
 		//parse the command
-		if(parse_command(command,args,token) == Exit){
-			break;
+		number_of_token = parse_command(command,args,token);
+
+		//search for pipes
+		int pipe_pos = -1;
+		for (int j = 0; j < number_of_token; j++) {
+			if (strcmp(args[j], "|") == 0) {
+				pipe_pos = j;
+				break;
+			}
 		}
-		
-		//execute the command
-		if(execute_command(args) == Exit){
-			break;
+
+		if (pipe_pos != -1) {
+			// execute commands with pipes
+			execute_with_pipe(args, pipe_pos);
+		} else {
+			// execute commands without pipes
+			if (execute_command(args) == Exit){
+			 		break;
+				}
 		}
-       
+			
       }
 
     return 0;
@@ -55,7 +66,7 @@ int parse_command(char *command,char** args,char* token){
     
     args[i] = NULL; // Null-terminate the argument list
     
-    return 0;
+    return i;
 }
 
 int execute_command(char** args){
@@ -87,3 +98,50 @@ int execute_command(char** args){
     return 0;
 }
 	
+	
+// function to handle a single pipe
+void execute_with_pipe(char **args, int pipe_pos) {
+
+    int pipefd[2];
+    pid_t pid1, pid2;
+
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+    }
+
+    pid1 = fork();
+    if (pid1 == 0) {
+        // First child: executes the command before the pipe
+        close(pipefd[0]); // Close unused read end
+        dup2(pipefd[1], STDOUT_FILENO); // Write end becomes stdout
+        close(pipefd[1]);
+
+        args[pipe_pos] = NULL; // Null terminate the first command
+        if (execvp(args[0], args) == -1) {
+            perror("execvp");
+            exit(EXIT_FAILURE); // Exit child process
+        }
+    }
+
+    pid2 = fork();
+    if (pid2 == 0) {
+        // Second child: executes the command after the pipe
+        close(pipefd[1]); // Close unused write end
+        dup2(pipefd[0], STDIN_FILENO); // Read end becomes stdin
+        close(pipefd[0]);
+
+        if (execvp(args[pipe_pos + 1], &args[pipe_pos + 1]) == -1) {
+            perror("execvp");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Close pipe fds in parent
+    close(pipefd[0]);
+    close(pipefd[1]);
+
+    // Wait for children to exit
+    waitpid(pid1, NULL, 0);
+    waitpid(pid2, NULL, 0);
+}
+
