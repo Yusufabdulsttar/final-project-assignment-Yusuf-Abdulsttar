@@ -11,17 +11,29 @@
 /* section : Includes   */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 /* section : Micro Declaration  */
 
 #define MAX_COMMAND_LENGTH 1024
+#define MAX_ARGS 10
 #define Exit 1
+
 /* section : Micro Function Declaration  */
 
 /* section : Data Type Declaration  */
 
+char command[MAX_COMMAND_LENGTH]; //array to store the commands
+char *args[MAX_ARGS]; // Array to hold command arguments
+char *token=NULL; //token for parsing
+	
 /* section : Function Declaration  */
 
 int read_command(char *command,int max_length);
+int parse_command(char *command,char** args,char* token);
+int execute_command(char** args);
 
 #endif	/* MY_SHELL_H */
