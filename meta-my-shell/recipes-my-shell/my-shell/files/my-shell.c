@@ -9,11 +9,14 @@
 int main() {
 	
     while (1) {
-        printf("myshell> ");  // Print the prompt
+		//Print the prompt
+		if(prompt() == Exit){
+			printf("Error in prompt");
+		}	
 
 		//read the command
 		if(read_command(command,MAX_COMMAND_LENGTH) == Exit){
-			break;
+			printf("Error in read");
 		}
 		
 		//parse the command
@@ -33,13 +36,34 @@ int main() {
 			execute_with_pipe(args, pipe_pos);
 		} else {
 			// execute commands without pipes
-			if (execute_command(args) == Exit){
-			 		break;
-				}
+			execute_command(args);
 		}
 			
       }
 
+    return 0;
+}
+
+
+int prompt(void){
+    // Print the prompt
+    
+	char *cwd = (char *)malloc(PROMPT_SIZE);
+	if (cwd == NULL){
+		printf("Allocation failed");
+		return Exit;
+	}
+
+    printf("myshell: ");  
+    
+    // Get the current working directory
+    if (getcwd(cwd, PROMPT_SIZE) == NULL) {
+        perror("getcwd");
+        return Exit;
+    }
+	printf("%s> ", cwd);
+	free(cwd);
+	
     return 0;
 }
 
@@ -69,7 +93,7 @@ int parse_command(char *command,char** args,char* token){
     return i;
 }
 
-int execute_command(char** args){
+void execute_command(char** args){
 
     // Execute the command
     int status= 0;
@@ -80,14 +104,12 @@ int execute_command(char** args){
         // Child process
         if (execvp(args[0], args) == -1) {
             perror("my-shell"); // Print error if execvp fails
-            return Exit;
         }
         exit(EXIT_FAILURE); // Exit child process
         
     } else if (pid < 0) {
         // Forking error
         perror("fork");
-        return Exit;
         
     } else {
         // Parent process waits for child to complete
@@ -95,7 +117,7 @@ int execute_command(char** args){
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
-    return 0;
+    
 }
 	
 	

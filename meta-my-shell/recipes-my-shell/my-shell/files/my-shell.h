@@ -21,6 +21,7 @@
 #define MAX_COMMAND_LENGTH 1024
 #define MAX_ARGS 10
 #define Exit 1
+#define PROMPT_SIZE 256
 
 /* section : Micro Function Declaration  */
 
@@ -34,8 +35,9 @@ int number_of_token = 0;
 /* section : Function Declaration  */
 
 int read_command(char *command,int max_length);
+int prompt(void);
 int parse_command(char *command,char** args,char* token);
 void execute_with_pipe(char **args, int pipe_pos);
-int execute_command(char** args);
+void execute_command(char** args);
 
 #endif	/* MY_SHELL_H */
