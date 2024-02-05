@@ -20,8 +20,14 @@
 
 #define MAX_COMMAND_LENGTH 1024
 #define MAX_ARGS 10
+
 #define Exit 1
+
+// for prompt
 #define PROMPT_SIZE 256
+#define BLUE "\033[1;34m"
+#define YELLOW "\033[1;33m"
+#define RESET "\033[0m"
 
 /* section : Micro Function Declaration  */
 

@@ -7,7 +7,7 @@
 #include "my-shell.h"
 
 int main() {
-	
+
     while (1) {
 		//Print the prompt
 		if(prompt() == Exit){
@@ -54,14 +54,13 @@ int prompt(void){
 		return Exit;
 	}
 
-    printf("myshell: ");  
-    
+    printf("%sMy-shell:%s", BLUE, RESET);
     // Get the current working directory
     if (getcwd(cwd, PROMPT_SIZE) == NULL) {
         perror("getcwd");
         return Exit;
     }
-	printf("%s> ", cwd);
+	printf("%s%s>%s ", YELLOW, cwd, RESET);
 	free(cwd);
 	
     return 0;
@@ -103,7 +102,7 @@ void execute_command(char** args){
     if (pid == 0) {
         // Child process
         if (execvp(args[0], args) == -1) {
-            perror("my-shell"); // Print error if execvp fails
+            perror("My-shell"); // Print error if execvp fails
         }
         exit(EXIT_FAILURE); // Exit child process
         
