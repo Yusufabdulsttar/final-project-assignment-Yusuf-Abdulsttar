@@ -21,6 +21,9 @@ int main() {
 		
 		//parse the command
 		number_of_token = parse_command(command,args,token);
+		if (number_of_token == 0){
+			continue; // No command entered
+		}
 		
 		//built-in command
 		if (built_in_command(args) == Success){
