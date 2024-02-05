@@ -21,7 +21,15 @@ int main() {
 		
 		//parse the command
 		number_of_token = parse_command(command,args,token);
-
+		
+		//built-in command
+		if (built_in_command(args) == Success){
+			continue; // Process next command
+		}
+		else if (built_in_command(args) == Exit){
+			break; // Exit the shell
+		}
+		
 		//search for pipes
 		int pipe_pos = -1;
 		for (int j = 0; j < number_of_token; j++) {
@@ -30,7 +38,8 @@ int main() {
 				break;
 			}
 		}
-
+		
+		//execute commands
 		if (pipe_pos != -1) {
 			// execute commands with pipes
 			execute_with_pipe(args, pipe_pos);
@@ -39,11 +48,10 @@ int main() {
 			execute_command(args);
 		}
 			
-      }
+     }
 
     return 0;
 }
-
 
 int prompt(void){
     // Print the prompt
@@ -90,6 +98,30 @@ int parse_command(char *command,char** args,char* token){
     args[i] = NULL; // Null-terminate the argument list
     
     return i;
+}
+
+// Check for built-in commands 
+int built_in_command(char** args){
+
+    if (strcmp(args[0], "cd") == 0) {
+        // Built-in command: cd
+        if (args[1] == NULL) {
+            fprintf(stderr, "Expected argument to \"cd\"\n");
+            return Success;
+            
+        } else {
+            if (chdir(args[1]) != 0) {
+                perror("My-shell");
+            }
+           return Success;
+        }
+        
+    } else if (strcmp(args[0], "exit") == 0) {
+        // Built-in command: exit
+        printf("\nExiting...\n");
+       return Exit; 
+    }
+	return 0;
 }
 
 void execute_command(char** args){

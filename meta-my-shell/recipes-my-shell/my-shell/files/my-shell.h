@@ -22,6 +22,7 @@
 #define MAX_ARGS 10
 
 #define Exit 1
+#define Success 2
 
 // for prompt
 #define PROMPT_SIZE 256
@@ -35,14 +36,16 @@
 
 char command[MAX_COMMAND_LENGTH]; //array to store the commands
 char *args[MAX_ARGS]; // Array to hold command arguments
+
 char *token=NULL; //token for parsing
-int number_of_token = 0;
+int number_of_token = 0; //number of token
 	
 /* section : Function Declaration  */
 
 int read_command(char *command,int max_length);
 int prompt(void);
 int parse_command(char *command,char** args,char* token);
+int built_in_command(char** args);
 void execute_with_pipe(char **args, int pipe_pos);
 void execute_command(char** args);
 
