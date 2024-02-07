@@ -33,21 +33,33 @@ int main() {
 			break; // Exit the shell
 		}
 		
-		//search for pipes
-		int pipe_pos = -1;
+		// search for pipes and background process
+		pipe_pos = -1;
+		is_background = 0;
 		for (int j = 0; j < number_of_token; j++) {
-			if (strcmp(args[j], "|") == 0) {
+			//search for background process
+			if (strcmp(args[j], "&") == 0) { 
+				is_background = 1;
+				args[j] = '\0'; // Remove (&) from command
+				break;
+			}
+			//search for pipes
+			else if (strcmp(args[j], "|") == 0) { 
 				pipe_pos = j;
 				break;
 			}
 		}
 		
-		//execute commands
-		if (pipe_pos != -1) {
+		// execute commands
+		if (is_background){
+			// execute command in background
+			execute_background(args);
+		}
+		else if (pipe_pos != -1) {
 			// execute commands with pipes
 			execute_with_pipe(args, pipe_pos);
 		} else {
-			// execute commands without pipes
+			// execute commands normally
 			execute_command(args);
 		}
 			
@@ -127,6 +139,26 @@ int built_in_command(char** args){
 	return 0;
 }
 
+// Function to execute a command in the background
+void execute_background(char** args) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        // Child process
+        if (execvp(args[0], args) == -1) {
+            perror("execvp");
+            exit(EXIT_FAILURE);  // Exit child process
+        }
+    } else if (pid < 0) {
+        // Error forking
+        perror("fork");
+    } else {
+        // Parent process
+        // Print background process information
+        printf("Background process with PID %d started.\n", pid);
+    }
+}
+
+// Execute the command normally
 void execute_command(char** args){
 
     // Execute the command
@@ -153,8 +185,7 @@ void execute_command(char** args){
     }
     
 }
-	
-	
+		
 // function to handle a single pipe
 void execute_with_pipe(char **args, int pipe_pos) {
 

@@ -37,6 +37,10 @@
 char command[MAX_COMMAND_LENGTH]; //array to store the commands
 char *args[MAX_ARGS]; // Array to hold command arguments
 
+// for execute pipes and background process
+int pipe_pos = -1;
+int is_background = 0;
+
 char *token=NULL; //token for parsing
 int number_of_token = 0; //number of token
 	
@@ -46,6 +50,7 @@ int read_command(char *command,int max_length);
 int prompt(void);
 int parse_command(char *command,char** args,char* token);
 int built_in_command(char** args);
+void execute_background(char** args);
 void execute_with_pipe(char **args, int pipe_pos);
 void execute_command(char** args);
 
