@@ -35,10 +35,16 @@ int main() {
 		
 		// search for pipes and background process
 		pipe_pos = -1;
+		bring_to_fg = -1;
 		is_background = 0;
 		for (int j = 0; j < number_of_token; j++) {
+			//search for fg to bring background process
+			if (strcmp(args[j], "fg") == 0) { 	
+				bring_to_fg = j;    
+				break;
+			}
 			//search for background process
-			if (strcmp(args[j], "&") == 0) { 
+			else if (strcmp(args[j], "&") == 0) { 
 				is_background = 1;
 				args[j] = '\0'; // Remove (&) from command
 				break;
@@ -51,7 +57,12 @@ int main() {
 		}
 		
 		// execute commands
-		if (is_background){
+		if (bring_to_fg != -1){ 
+			// bring the background process to the foreground
+	        bring_to_foreground(args,&bring_to_fg);     
+			continue; 
+		}
+		else if (is_background){
 			// execute command in background
 			execute_background(args);
 		}
@@ -155,7 +166,62 @@ void execute_background(char** args) {
         // Parent process
         // Print background process information
         printf("Background process with PID %d started.\n", pid);
+        
+        // Add background process to list
+        if (num_bg_processes < MAX_BG_PROCESSES) {
+            bg_processes[num_bg_processes] = pid;
+            num_bg_processes++;
+        } else {
+            printf("Maximum number of background processes reached.\n");
+        }
+        
     }
+}
+
+// Function to bring a background process to the foreground
+void bring_to_foreground(char** args,int* position) {
+	
+	// handle no input to fg
+	if (number_of_token == 1){
+		printf("fg: Expect argument\n");
+		return;
+	}
+	
+    // Extract the PID from the command
+    pid_t pid = atoi(args[(*position)+1]); 
+    
+    // handle string input instead of pid
+	if (pid == 0){
+		printf("fg: Expect pid\n");
+		return;
+	}
+	
+	// handle garbage number
+	if (num_bg_processes == 0){
+		printf("fg: %d: no such job\n", pid);
+	}
+	
+    // search for pid to bring back the process
+    for (int i = 0; i < num_bg_processes; i++) {
+        if (bg_processes[i] == pid) {
+		
+			// bring the background process to the foreground			
+			printf("Bringing background process with PID %d to foreground\n", pid);
+			waitpid(pid, NULL, 0); // Wait for the process to complete
+
+			// Remove the process from the list of background processes
+            for (int j = i; j < num_bg_processes - 1; j++) {
+                bg_processes[j] = bg_processes[j + 1];
+            }
+            num_bg_processes--;
+            break;
+        }
+        // if the pid not found 
+        else if (i == num_bg_processes-1){
+        	printf("fg: %d: no such job\n", pid);
+        }
+    }
+    
 }
 
 // Execute the command normally

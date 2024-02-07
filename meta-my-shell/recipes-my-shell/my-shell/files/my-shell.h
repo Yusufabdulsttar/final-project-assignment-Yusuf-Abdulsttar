@@ -21,6 +21,8 @@
 #define MAX_COMMAND_LENGTH 1024
 #define MAX_ARGS 10
 
+#define MAX_BG_PROCESSES 10
+
 #define Exit 1
 #define Success 2
 
@@ -44,6 +46,10 @@ int is_background = 0;
 char *token=NULL; //token for parsing
 int number_of_token = 0; //number of token
 	
+pid_t bg_processes[MAX_BG_PROCESSES]; // Array to store background process IDs
+int num_bg_processes = 0; // Counter for the number of background processes
+int bring_to_fg = 0;
+	
 /* section : Function Declaration  */
 
 int read_command(char *command,int max_length);
@@ -51,6 +57,7 @@ int prompt(void);
 int parse_command(char *command,char** args,char* token);
 int built_in_command(char** args);
 void execute_background(char** args);
+void bring_to_foreground(char** args,int* position);
 void execute_with_pipe(char **args, int pipe_pos);
 void execute_command(char** args);
 
