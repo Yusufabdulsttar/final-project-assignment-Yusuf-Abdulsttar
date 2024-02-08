@@ -253,6 +253,12 @@ void execute_command(char** args){
         
         // Parent process waits for child to complete
         do {
+        		// to inform if there is a SIGTSTP signal
+				if (SIGTSTP_flag == 1 ){
+					SIGTSTP_flag = 0;
+					break;
+				}
+				
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
         
@@ -328,6 +334,8 @@ void signal_handler(int signal) {
 		    }
 		    
 		    foreground_pid = -1; // Reset foreground process PID
+		    
+		    SIGTSTP_flag = 1; //to inform execute fun about the signal
 		    
 		} else {
 		    printf("\nNo foreground process to move to background.\n");
