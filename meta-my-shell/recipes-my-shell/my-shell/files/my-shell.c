@@ -211,6 +211,10 @@ void bring_to_foreground(char** args,int* position) {
 		
 			// bring the background process to the foreground			
 			printf("Bringing background process with PID %d to foreground\n", pid);
+			
+			// Send SIGCONT signal to resume the stoped process
+			kill(pid, SIGCONT);
+			
 			waitpid(pid, NULL, 0); // Wait for the process to complete
 
 			// Remove the process from the list of background processes
