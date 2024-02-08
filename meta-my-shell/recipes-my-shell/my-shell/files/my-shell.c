@@ -248,10 +248,15 @@ void execute_command(char** args){
         perror("fork");
         
     } else {
+		// Parent process
+        foreground_pid = pid; // Set the foreground process PID
+        
         // Parent process waits for child to complete
         do {
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+        
+        foreground_pid = -1; // Reset foreground process PID
     }
     
 }
@@ -309,5 +314,27 @@ void signal_handler(int signal) {
         
     } else if (signal == SIGTSTP) {
         printf("\nStoped using (Ctrl+Z).\n");
-	}
+        
+		// Check if there's a foreground process running
+		if (foreground_pid > 0) {
+		    printf("\nSIGTSTP received. Process %d moved to background.\n", foreground_pid);
+		    
+		    // Add background process to list
+		    if (num_bg_processes < MAX_BG_PROCESSES) {
+		        bg_processes[num_bg_processes] = foreground_pid;
+		        num_bg_processes++;
+		    } else {
+		        printf("Maximum number of background processes reached.\n");
+		    }
+		    
+		    foreground_pid = -1; // Reset foreground process PID
+		    
+		} else {
+		    printf("\nNo foreground process to move to background.\n");
+		}
+		
+		// Make sure the message is printed immediately
+		fflush(stdout); 
+		    
+    }
 }

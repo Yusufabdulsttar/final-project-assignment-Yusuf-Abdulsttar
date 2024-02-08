@@ -48,6 +48,7 @@ char *token=NULL; //token for parsing
 int number_of_token = 0; //number of token
 	
 pid_t bg_processes[MAX_BG_PROCESSES]; // Array to store background process IDs
+pid_t foreground_pid = -1; // keep track of the foreground process PID
 int num_bg_processes = 0; // Counter for the number of background processes
 int bring_to_fg = 0;
 	
