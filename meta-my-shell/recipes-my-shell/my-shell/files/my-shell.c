@@ -322,6 +322,19 @@ void signal_handler(int signal) {
     if (signal == SIGINT) {
         printf("\nTerminated using (Ctrl+C).\n");
         
+        //handle receive signal without running process
+        if (foreground_pid == -1) { 
+        
+			//Print the prompt
+			if(prompt() == Exit){
+				printf("Error in prompt");
+			}	
+		
+		// Make sure the message is printed immediately
+		fflush(stdout);
+		
+        }
+        
     } else if (signal == SIGTSTP) {
         printf("\nStoped using (Ctrl+Z).\n");
         
@@ -343,6 +356,12 @@ void signal_handler(int signal) {
 		    
 		} else {
 		    printf("\nNo foreground process to move to background.\n");
+		    
+			//Print the prompt
+			if(prompt() == Exit){
+				printf("Error in prompt");
+			}	
+
 		}
 		
 		// Make sure the message is printed immediately
