@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 /* section : Micro Declaration  */
 
@@ -60,5 +61,6 @@ void execute_background(char** args);
 void bring_to_foreground(char** args,int* position);
 void execute_with_pipe(char **args, int pipe_pos);
 void execute_command(char** args);
+void signal_handler(int signal);
 
 #endif	/* MY_SHELL_H */

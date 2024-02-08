@@ -9,6 +9,10 @@
 int main() {
 
     while (1) {
+	    // Register signal handler for both SIGINT and SIGTSTP
+    	signal(SIGINT, signal_handler); // Register SIGINT handler
+   		signal(SIGTSTP, signal_handler); // Register SIGTSTP handler
+   		
 		//Print the prompt
 		if(prompt() == Exit){
 			printf("Error in prompt");
@@ -298,3 +302,12 @@ void execute_with_pipe(char **args, int pipe_pos) {
     waitpid(pid2, NULL, 0);
 }
 
+// Signal handler for both SIGINT (Ctrl+C) and SIGTSTP (Ctrl+Z)
+void signal_handler(int signal) {
+    if (signal == SIGINT) {
+        printf("\nTerminated using (Ctrl+C).\n");
+        
+    } else if (signal == SIGTSTP) {
+        printf("\nStoped using (Ctrl+Z).\n");
+	}
+}
