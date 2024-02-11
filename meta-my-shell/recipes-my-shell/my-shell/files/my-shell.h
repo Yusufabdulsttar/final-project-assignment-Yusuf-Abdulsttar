@@ -64,5 +64,7 @@ void bring_to_foreground(char** args,int* position);
 void execute_with_pipe(char **args, int pipe_pos);
 void execute_command(char** args);
 void signal_handler(int signal);
+void pipes_and_background(char **args);
+void displayHelp();
 
 #endif	/* MY_SHELL_H */

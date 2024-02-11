@@ -30,36 +30,16 @@ int main() {
 		}
 		
 		//built-in command
-		state = built_in_command(args);
-		if (state == Success){
+		cmd_status = built_in_command(args);
+		if (cmd_status == Success){
 			continue; // Process next command
 		}
-		else if (state == Exit){
+		else if (cmd_status == Exit){
 			break; // Exit the shell
 		}
 		
 		// search for pipes and background process
-		pipe_pos = -1;
-		bring_to_fg = -1;
-		is_background = 0;
-		for (int j = 0; j < number_of_token; j++) {
-			//search for fg to bring background process
-			if (strcmp(args[j], "fg") == 0) { 	
-				bring_to_fg = j;    
-				break;
-			}
-			//search for background process
-			else if (strcmp(args[j], "&") == 0) { 
-				is_background = 1;
-				args[j] = '\0'; // Remove (&) from command
-				break;
-			}
-			//search for pipes
-			else if (strcmp(args[j], "|") == 0) { 
-				pipe_pos = j;
-				break;
-			}
-		}
+		pipes_and_background(args);
 		
 		// execute commands
 		if (bring_to_fg != -1){ 
@@ -137,17 +117,24 @@ int built_in_command(char** args){
     if (strcmp(args[0], "cd") == 0) {
         // Built-in command: cd
         if (args[1] == NULL) {
-            fprintf(stderr, "Expected argument to \"cd\"\n");
+            fprintf(stderr, "Expected argument to \"cd\"\n\n");
+            printf("  - help: Display help message\n");
             return Success;
             
         } else {
             if (chdir(args[1]) != 0) {
                 perror("My-shell");
+                printf("\n  - help: Display help message\n");
             }
            return Success;
         }
         
-    } else if (strcmp(args[0], "exit") == 0) {
+    } else if (strcmp(args[0], "help") == 0) {
+        // Check for 'help' command
+        displayHelp();
+       return Success; 
+       
+    }else if (strcmp(args[0], "exit") == 0) {
         // Built-in command: exit
         printf("\nExiting...\n");
        return Exit; 
@@ -158,15 +145,19 @@ int built_in_command(char** args){
 // Function to execute a command in the background
 void execute_background(char** args) {
     pid_t pid = fork();
+    
     if (pid == 0) {
         // Child process
         if (execvp(args[0], args) == -1) {
             perror("execvp");
+            printf("\n  - help: Display help message\n");
             exit(EXIT_FAILURE);  // Exit child process
         }
+        
     } else if (pid < 0) {
         // Error forking
         perror("fork");
+        
     } else {
         // Parent process
         // Print background process information
@@ -176,6 +167,7 @@ void execute_background(char** args) {
         if (num_bg_processes < MAX_BG_PROCESSES) {
             bg_processes[num_bg_processes] = pid;
             num_bg_processes++;
+            
         } else {
             printf("Maximum number of background processes reached.\n");
         }
@@ -188,7 +180,9 @@ void bring_to_foreground(char** args,int* position) {
 	
 	// handle no input to fg
 	if (number_of_token == 1){
-		printf("fg: Expect argument\n");
+		printf("fg: Expect argument\n\n");
+		
+		printf("  - help: Display help message\n");
 		return;
 	}
 	
@@ -197,7 +191,9 @@ void bring_to_foreground(char** args,int* position) {
     
     // handle string input instead of pid
 	if (pid == 0){
-		printf("fg: Expect pid\n");
+		printf("fg: Expect pid\n\n");
+		
+		printf("  - help: Display help message\n");
 		return;
 	}
 	
@@ -245,6 +241,7 @@ void execute_command(char** args){
         // Child process
         if (execvp(args[0], args) == -1) {
             perror("My-shell"); // Print error if execvp fails
+            printf("\n  - help: Display help message\n");
         }
         exit(EXIT_FAILURE); // Exit child process
         
@@ -318,6 +315,35 @@ void execute_with_pipe(char **args, int pipe_pos) {
     waitpid(pid2, NULL, 0);
 }
 
+// search for pipes and background process
+void pipes_and_background(char **args){
+
+	pipe_pos = -1;
+	bring_to_fg = -1;
+	is_background = 0;
+	
+	for (int j = 0; j < number_of_token; j++) {
+		//search for fg to bring background process
+		if (strcmp(args[j], "fg") == 0) { 	
+			bring_to_fg = j;    
+			break;
+		}
+		
+		//search for background process
+		else if (strcmp(args[j], "&") == 0) { 
+			is_background = 1;
+			args[j] = '\0'; // Remove (&) from command
+			break;
+		}
+		
+		//search for pipes
+		else if (strcmp(args[j], "|") == 0) { 
+			pipe_pos = j;
+			break;
+		}
+	}
+}
+
 // Signal handler for both SIGINT (Ctrl+C) and SIGTSTP (Ctrl+Z)
 void signal_handler(int signal) {
     if (signal == SIGINT) {
@@ -369,4 +395,21 @@ void signal_handler(int signal) {
 		fflush(stdout); 
 		    
     }
+}
+
+// Function that displays help information
+void displayHelp() {
+
+    printf("My-Shell Help:\n\n");
+    printf("  - exit: Exit the shell\n\n");
+    printf("  - cd <directory>: Change the current directory to <directory>\n\n");
+    printf("  - fg <pid>: Bring the process with PID <pid> to the foreground\n\n");
+    printf("  - Using pipes: You can use pipes '|' to direct the output of one command as the input to another.\n");
+    printf("    Example: cat file | grep 'string'\n\n");
+    printf("  - CTRL+C (SIGINT): Terminate the current foreground process.\n");
+    printf("  - CTRL+Z (SIGTSTP): Suspend the current foreground process and move it to the background.\n");
+    printf("    You can resume suspended processes with the 'fg' command by specifying their PID.\n\n");
+    printf("  - help: Display this help message\n\n");
+    printf("You can also use any other standard shell commands.\n");
+    
 }
