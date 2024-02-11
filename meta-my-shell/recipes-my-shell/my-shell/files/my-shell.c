@@ -30,10 +30,11 @@ int main() {
 		}
 		
 		//built-in command
-		if (built_in_command(args) == Success){
+		state = built_in_command(args);
+		if (state == Success){
 			continue; // Process next command
 		}
-		else if (built_in_command(args) == Exit){
+		else if (state == Exit){
 			break; // Exit the shell
 		}
 		
