@@ -32,3 +32,9 @@ do_install () {
 }
 
 
+# Update alternatives to set my-shell as the default
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "my-shell"
+ALTERNATIVE_TARGET[my-shell] = "${bindir}/my-shell"
+ALTERNATIVE_LINK_NAME[my-shell] = "/bin/sh"
+
