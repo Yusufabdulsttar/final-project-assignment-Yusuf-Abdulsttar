@@ -51,8 +51,8 @@ pid_t bg_processes[MAX_BG_PROCESSES]; // Array to store background process IDs
 pid_t foreground_pid = -1; // keep track of the foreground process PID
 int num_bg_processes = 0; // Counter for the number of background processes
 int bring_to_fg = 0;
-int SIGTSTP_flag = 0; //to inform execute fun about the signal
 int cmd_status = 0; 
+
 /* section : Function Declaration  */
 
 int read_command(char *command,int max_length);

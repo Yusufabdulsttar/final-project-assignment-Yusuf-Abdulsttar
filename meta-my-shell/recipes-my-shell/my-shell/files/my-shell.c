@@ -241,9 +241,11 @@ void execute_command(char** args){
         // Child process
         if (execvp(args[0], args) == -1) {
             perror("My-shell"); // Print error if execvp fails
+            
             printf("\n  - help: Display help message\n");
-        }
-        exit(EXIT_FAILURE); // Exit child process
+            
+            exit(EXIT_FAILURE); // Exit child process
+        }        
         
     } else if (pid < 0) {
         // Forking error
@@ -253,17 +255,18 @@ void execute_command(char** args){
 		// Parent process
         foreground_pid = pid; // Set the foreground process PID
         
-        // Parent process waits for child to complete
         do {
-        		// to inform if there is a SIGTSTP signal
-				if (SIGTSTP_flag == 1 ){
-					SIGTSTP_flag = 0;
-					break;
-				}
-				
+            // Wait for the child process to change state (terminated, stopped, or continued)
             waitpid(pid, &status, WUNTRACED);
+            
+            // Check if the child process was stopped by SIGTSTP
+            if (WIFSTOPPED(status)) {
+                            
+                break;
+            }
+            
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-        
+       
         foreground_pid = -1; // Reset foreground process PID
     }
     
@@ -377,9 +380,7 @@ void signal_handler(int signal) {
 		        printf("Maximum number of background processes reached.\n");
 		    }
 		    
-		    foreground_pid = -1; // Reset foreground process PID
-		    
-		    SIGTSTP_flag = 1; //to inform execute fun about the signal
+		    kill(foreground_pid, SIGSTOP);
 		    
 		} else {
 		    printf("\nNo foreground process to move to background.\n");
