@@ -4,5 +4,21 @@
 # Schedule:
 - the [Schedule Page](https://github.com/users/Yusufabdulsttar/projects/1)
 
+# Building
+### 1- Clone repository
 
-
+```bash
+git clone https://github.com/Yusufabdulsttar/final-project-assignment-Yusuf-Abdulsttar.git
+```
+### 2- update submodule 
+```bash
+git submodule update --init --recursive
+```
+### 3- Run build from the repository direcory
+```bash
+./build.sh
+```
+### 4- Run QEMU from the repository direcory
+```bash
+./runqemu.sh
+```
