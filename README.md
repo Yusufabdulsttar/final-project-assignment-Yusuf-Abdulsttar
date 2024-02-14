@@ -4,7 +4,7 @@
 # Schedule:
 - the [Schedule Page](https://github.com/users/Yusufabdulsttar/projects/1)
 # Video Demo:
-- the [Video Demo](https://drive.google.com/file/d/1SPjwxqtQHR8m7m48u2CtvLylWpxOgEng/view?usp=sharing)
+- the [Video Demo](https://github.com/Yusufabdulsttar/final-project-assignment-Yusuf-Abdulsttar/wiki/Yusuf-Final-Project-Video)
 
 # Building
 ### 1- Clone repository
